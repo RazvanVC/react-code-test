@@ -4,6 +4,7 @@ import {
     Circle,
     IconEmailRegular,
     IconHomeLight,
+    IconImageRegular,
     IconKeyLight,
     IconMobileDeviceRegular,
     Inline,
@@ -20,9 +21,19 @@ type Props = {
 };
 
 const ContactDetails: React.FC<Props> = ({ person }) => (
+    
     <Stack space={24}>
         <Inline space={32} alignItems="center">
-            <Circle size={100} backgroundImage={person.picture.large} />
+            {
+                person.picture.large ? (
+                    <Circle size={100} backgroundImage={person.picture.large} />
+                ) : (
+                    <Circle size={100} backgroundColor="#f2f4ff">
+                        <IconImageRegular size={48}  />
+                    </Circle>
+                )
+            }
+            {/*<Circle size={100} backgroundImage={person.picture.large !== "" ? person.picture.large : "./user.png"} />*/}
 
             <Stack space={8}>
                 <Text4 regular>
@@ -96,6 +107,10 @@ const LoginDetails: React.FC<Props> = ({ person }) => {
 
 const PersonDetails: React.FC<Props> = ({ person }) => {
     const [selectedTabIndex, setSelectedTabIndex] = React.useState<number>(0);
+
+    React.useEffect(() => {
+        setSelectedTabIndex(0);
+    }, [person]);
 
     const renderTab = () => {
         switch (selectedTabIndex) {
