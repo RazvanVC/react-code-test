@@ -21,7 +21,6 @@ type Props = {
 };
 
 const ContactDetails: React.FC<Props> = ({ person }) => (
-    
     <Stack space={24}>
         <Inline space={32} alignItems="center">
             {
@@ -33,8 +32,6 @@ const ContactDetails: React.FC<Props> = ({ person }) => (
                     </Circle>
                 )
             }
-            {/*<Circle size={100} backgroundImage={person.picture.large !== "" ? person.picture.large : "./user.png"} />*/}
-
             <Stack space={8}>
                 <Text4 regular>
                     {[

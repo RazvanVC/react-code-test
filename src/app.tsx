@@ -1,6 +1,8 @@
 import {
     Circle,
     MainNavigationBar,
+    NavigationBarActionGroup,
+    NavigationBarAction,
     MainSectionHeader,
     MainSectionHeaderLayout,
     MasterDetailLayout,
@@ -9,6 +11,9 @@ import {
     Row,
     RowList,
     useScreenSize,
+    IconStarRegular,
+    IconStarFilled,
+    Tag,
 } from "@telefonica/mistica";
 import React from "react";
 import { fetchPeople, type Person } from "./api";
@@ -90,9 +95,18 @@ const App = (): JSX.Element => {
         nat: "NSEL",
     };
 
-    //let selectedPerson: Person | null = null; // TODO Task 1: implement the logic to select a person
+    function handleFavoriteOnPress(person: Person) {
+        if (favorites.includes(person)) {
+            setFavorites(favorites.filter((p) => p !== person));
+        } else {
+            setFavorites([...favorites, person]);
+        }
+        if (mainSection === "Favorites") {
+            setSelectedPerson(null);
+        }
+    }
 
-    const mainSections = ["People"] as const;
+    const mainSections = ["People", "Favorites"] as const;
     const section: MainSection = "People";
 
     //Implement a loading UI while the user waits for the api response.
@@ -102,42 +116,115 @@ const App = (): JSX.Element => {
         return <div>Error</div>;
     }
 
-    
-
-    //catch error "FetchPeople: Something went wrong" and show a negative box with the error message
-    //if (error) {
-    //    return <NegativeBox message={error.message} />;
-    //}
-
-
     return (
         <main>
             {(!isTabletOrSmaller || !selectedPerson) && (
                 <>
                     <MainNavigationBar
                         isInverse
-                        selectedIndex={section === "People" ? 0 : 1}
+                        selectedIndex={mainSection === "People" ? 0 : 1}
                         sections={mainSections.map((section) => ({
                             title: section,
                             onPress: () => {
                                 setMainSection(section);
-                                console.log("Section pressed (Task 6)");
+                                setSelectedPerson(null);
                             },
                         }))}
                     />
                     <MainSectionHeaderLayout>
-                        <MainSectionHeader title={section} />
+                        <MainSectionHeader title={mainSection} />
                     </MainSectionHeaderLayout>
                 </>
             )}
 
-            <MasterDetailLayout
+            {mainSection==="People" ? (
+                <MasterDetailLayout
                 isOpen={!!selectedPerson}
                 master={
                     <NegativeBox>
                         <RowList>
                             {people.map((person) => (
                                 <Row
+                                    key={person.login.uuid}
+                                    headline={
+                                        //If favorite person is selected, show the tag else nothing
+                                        favorites.includes(person) ? (
+                                            <Tag type="promo">Favorite</Tag>
+                                        ) : null}
+                                    asset={
+                                        <Circle
+                                            size={40}
+                                            backgroundImage={
+                                                person.picture.medium
+                                            }
+                                        />
+                                    }
+                                    title={[
+                                        person.name.first,
+                                        person.name.last,
+                                    ].join(" ")}
+                                    onPress={() => {
+                                        setSelectedPerson(person);
+                                    }}
+                                />
+                            ))}
+                        </RowList>
+                    </NegativeBox>
+                }
+                detail={
+                    selectedPerson ? (
+                        <>
+                            <NavigationBar
+                                isInverse={isTabletOrSmaller}
+                                topFixed={isTabletOrSmaller}
+                                onBack={() => {
+                                    setSelectedPerson(null);
+                                }}
+                                right={
+                                    <NavigationBarActionGroup>
+                                        <NavigationBarAction aria-label="Mark as favorite" onPress={
+                                            handleFavoriteOnPress.bind(null, selectedPerson)
+                                        }>
+                                            {favorites.includes(selectedPerson) ? (
+                                                <IconStarFilled color="currentColor" />
+                                            ) : (
+                                                <IconStarRegular color="currentColor" />
+                                            )}
+                                        </NavigationBarAction>
+                                    </NavigationBarActionGroup>
+                                }
+                                title={selectedPerson.name.first}
+                            />
+                            <PersonDetails person={selectedPerson} />
+                        </>
+                    ) : (
+                        <>
+                            <NavigationBar
+                                isInverse={isTabletOrSmaller}
+                                topFixed={isTabletOrSmaller}
+                                onBack={() => {
+                                    setSelectedPerson(null);
+                                }}
+                                title={"No person selected"}
+                            />
+                            <PersonDetails person={defaultPerson} />
+                        </>
+                    )
+                }
+            />) : (
+                <MasterDetailLayout
+                isOpen={!!selectedPerson}
+                master={
+                    <NegativeBox>
+                        <RowList>
+                            {favorites.map((person) => (
+                                <Row
+                                    headline={
+                                        //If favorite person is selected, show the tag else nothing
+                                        favorites.includes(person) ? (
+                                            <Tag type="promo">Favorite</Tag>
+                                        ) : null
+                                    }
                                     key={person.login.uuid}
                                     asset={
                                         <Circle
@@ -170,8 +257,20 @@ const App = (): JSX.Element => {
                                 topFixed={isTabletOrSmaller}
                                 onBack={() => {
                                     setSelectedPerson(null);
-                                    console.log("Navbar back pressed (Task 1)");
                                 }}
+                                right={
+                                    <NavigationBarActionGroup>
+                                        <NavigationBarAction aria-label="Mark as favorite" onPress={
+                                            handleFavoriteOnPress.bind(null, selectedPerson)
+                                        }>
+                                            {favorites.includes(selectedPerson) ? (
+                                                <IconStarFilled color="currentColor" />
+                                            ) : (
+                                                <IconStarRegular color="currentColor" />
+                                            )}
+                                        </NavigationBarAction>
+                                    </NavigationBarActionGroup>
+                                }
                                 title={selectedPerson.name.first}
                             />
                             <PersonDetails person={selectedPerson} />
@@ -183,7 +282,6 @@ const App = (): JSX.Element => {
                                 topFixed={isTabletOrSmaller}
                                 onBack={() => {
                                     setSelectedPerson(null);
-                                    console.log("Navbar back pressed (Task 1)");
                                 }}
                                 title={"No person selected"}
                             />
@@ -192,6 +290,7 @@ const App = (): JSX.Element => {
                     )
                 }
             />
+            )}
         </main>
     );
 };

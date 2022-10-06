@@ -46,3 +46,44 @@ test("Task 1", async () => {
         await screen.findByText(person1Street, { exact: false })
     ).toBeInTheDocument();
 });
+
+// Test for favorite functionality
+test("Task 2", async () => {
+    jest.spyOn(api, "fetchPeople").mockResolvedValue(apiResponse);
+
+    renderApp();
+
+    const person1 = apiResponse[0];
+    const person1Name = person1.name.first + " " + person1.name.last;
+
+    const personRow = await screen.findByRole("button", { name: person1Name });
+    expect(personRow).toBeInTheDocument();
+
+    await userEvent.click(personRow);
+
+    const favoriteButton = await screen.findByRole("button", {
+        name: "Mark as favorite",
+    });
+    expect(favoriteButton).toBeInTheDocument();
+
+    await userEvent.click(favoriteButton);
+
+    const favoriteTab = await screen.findByRole("button", { name: "Favorites" });
+    expect(favoriteTab).toBeInTheDocument();
+
+    await userEvent.click(favoriteTab);
+
+    await userEvent.click(personRow);
+
+    const locationTab = await screen.findByRole("tab", { name: "Location" });
+    expect(locationTab).toBeInTheDocument();
+
+    await userEvent.click(locationTab);
+
+    const person1Street = person1.location.street.name;
+
+    expect(
+        await screen.findByText(person1Street, { exact: false })
+    ).toBeInTheDocument();
+});
+
