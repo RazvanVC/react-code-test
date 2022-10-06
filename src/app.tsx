@@ -18,17 +18,20 @@ import {
 import React from "react";
 import { fetchPeople, type Person } from "./api";
 import PersonDetails from "./person-details";
+import LoadingScreen from "./LoadinScreen";
+import ErrorScreen from "./ErrorScreen";
 
 type MainSection = "People" | "Favorites";
 
 const App = (): JSX.Element => {
+    const [state, setState] = React.useState<"loading" | "loaded" | "error">("loading");
+
     const { isTabletOrSmaller } = useScreenSize();
+    const [mainSection, setMainSection] = React.useState<MainSection>("People");
 
     const [people, setPeople] = React.useState<Person[]>([]);
-    const [selectedPerson, setSelectedPerson] = React.useState<Person | null>(null);
-    const [mainSection, setMainSection] = React.useState<MainSection>("People");
     const [favorites, setFavorites] = React.useState<Person[]>([]);
-    const [state, setState] = React.useState<"loading" | "loaded" | "error">("loading");
+    const [selectedPerson, setSelectedPerson] = React.useState<Person | null>(null);
 
     React.useEffect(() => {
         fetchPeople()
@@ -107,13 +110,13 @@ const App = (): JSX.Element => {
     }
 
     const mainSections = ["People", "Favorites"] as const;
-    const section: MainSection = "People";
 
     //Implement a loading UI while the user waits for the api response.
     if (state === "loading") {
-        return <div>Loading...</div>;
+        //Make a beutiful loading UI
+        return <LoadingScreen />;
     } else if (state === "error") {
-        return <div>Error</div>;
+        return <ErrorScreen />;
     }
 
     return (
@@ -160,6 +163,7 @@ const App = (): JSX.Element => {
                                         />
                                     }
                                     title={[
+                                        person.name.title,
                                         person.name.first,
                                         person.name.last,
                                     ].join(" ")}
@@ -193,7 +197,11 @@ const App = (): JSX.Element => {
                                         </NavigationBarAction>
                                     </NavigationBarActionGroup>
                                 }
-                                title={selectedPerson.name.first}
+                                title={[
+                                    selectedPerson.name.title,
+                                    selectedPerson.name.first,
+                                    selectedPerson.name.last,
+                                ].join(" ")}
                             />
                             <PersonDetails person={selectedPerson} />
                         </>
@@ -235,6 +243,7 @@ const App = (): JSX.Element => {
                                         />
                                     }
                                     title={[
+                                        person.name.title,
                                         person.name.first,
                                         person.name.last,
                                     ].join(" ")}
@@ -271,7 +280,11 @@ const App = (): JSX.Element => {
                                         </NavigationBarAction>
                                     </NavigationBarActionGroup>
                                 }
-                                title={selectedPerson.name.first}
+                                title={[
+                                    selectedPerson.name.title,
+                                    selectedPerson.name.first,
+                                    selectedPerson.name.last,
+                                ].join(" ")}
                             />
                             <PersonDetails person={selectedPerson} />
                         </>

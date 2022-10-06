@@ -58,12 +58,12 @@ export const fetchPeople = async (): Promise<Person[]> => {
     );
     const data = await response.json();
 
-    /*// simulate bad network
+    // simulate bad network
     await sleep(2000);
     // simulate random errors
     if (Math.random() > 0.8) {
         throw new Error("FetchPeople: Something went wrong");
-    }*/
+    }
 
 
     return await data.results;
