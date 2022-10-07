@@ -10,17 +10,24 @@ import LoadingScreen from "./LoadinScreen";
 import ErrorScreen from "./ErrorScreen";
 import PeopleList from "./PeopleList";
 
-type MainSection = "People" | "Favorites";
-
 const App = (): JSX.Element => {
-    const [state, setState] = React.useState<"loading" | "loaded" | "error">("loading");
+    const [state, setState] = React.useState<"loading" | "loaded" | "error">(
+        "loading"
+    );
 
     const { isTabletOrSmaller } = useScreenSize();
-    const [mainSection, setMainSection] = React.useState<MainSection>("People");
-
+    //retrive main section from localstorage if exists
+    const [mainSection, setMainSection] = React.useState<string>(
+        localStorage.getItem("mainSection")?.replace(/"/gi, "") || "People"
+    );
     const [people, setPeople] = React.useState<Person[]>([]);
-    const [favorites, setFavorites] = React.useState<Person[]>([]);
-    const [selectedPerson, setSelectedPerson] = React.useState<Person | null>(null);
+    //retrive favorites from localstorage if exists
+    const [favorites, setFavorites] = React.useState<Person[]>(
+        JSON.parse(localStorage.getItem("favorites") || "[]")
+    );
+    const [selectedPerson, setSelectedPerson] = React.useState<Person | null>(
+        null
+    );
 
     React.useEffect(() => {
         fetchPeople()
@@ -35,6 +42,15 @@ const App = (): JSX.Element => {
         setSelectedPerson(null);
     }, []);
 
+    React.useEffect(() => {
+        //save favorites to localstorage
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+        localStorage.setItem("mainSection", JSON.stringify(mainSection));
+    }, [favorites, mainSection]);
+
+    /*
+     * This function is passed to the PeopleList component to handle the favorite button press
+     */
     function handleFavoriteOnPress(person: Person) {
         if (favorites.includes(person)) {
             setFavorites(favorites.filter((p) => p !== person));
@@ -48,9 +64,7 @@ const App = (): JSX.Element => {
 
     const mainSections = ["People", "Favorites"] as const;
 
-    //Implement a loading UI while the user waits for the api response.
     if (state === "loading") {
-        //Make a beutiful loading UI
         return <LoadingScreen />;
     } else if (state === "error") {
         return <ErrorScreen />;
@@ -77,12 +91,25 @@ const App = (): JSX.Element => {
                 </>
             )}
 
-            {mainSection==="People" ? (
-                <PeopleList favorites={favorites} list={people} isTabletOrSmaller={isTabletOrSmaller} handleFavoriteOnPress={handleFavoriteOnPress}/>
-                ) : (
-                <PeopleList favorites={favorites} list={favorites} isTabletOrSmaller={isTabletOrSmaller} handleFavoriteOnPress={handleFavoriteOnPress}/>
-                )
-            }
+            {mainSection === "People" ? (
+                <PeopleList
+                    favorites={favorites}
+                    list={people}
+                    isTabletOrSmaller={isTabletOrSmaller}
+                    handleFavoriteOnPress={handleFavoriteOnPress}
+                    selectedPerson={selectedPerson}
+                    setSelectedPerson={setSelectedPerson}
+                />
+            ) : (
+                <PeopleList
+                    favorites={favorites}
+                    list={favorites}
+                    isTabletOrSmaller={isTabletOrSmaller}
+                    handleFavoriteOnPress={handleFavoriteOnPress}
+                    selectedPerson={selectedPerson}
+                    setSelectedPerson={setSelectedPerson}
+                />
+            )}
         </main>
     );
 };

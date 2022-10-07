@@ -21,13 +21,18 @@ type Props = {
     list: Person[];
     handleFavoriteOnPress: (person: Person) => void;
     isTabletOrSmaller: boolean;
+    selectedPerson: Person | null;
+    setSelectedPerson: (person: Person | null) => void;
 };
 
-const PeopleList: React.FC<Props> = ({ list, favorites, handleFavoriteOnPress, isTabletOrSmaller }) => {
-
-    
-    const [selectedPerson, setSelectedPerson] = React.useState<Person | null>(null);
-
+const PeopleList: React.FC<Props> = ({
+    favorites,
+    list,
+    handleFavoriteOnPress,
+    isTabletOrSmaller,
+    selectedPerson,
+    setSelectedPerson,
+}) => {
     const defaultPerson: Person = {
         name: {
             title: "NSEL",
@@ -81,33 +86,37 @@ const PeopleList: React.FC<Props> = ({ list, favorites, handleFavoriteOnPress, i
         nat: "NSEL",
     };
 
-    return <MasterDetailLayout
+    return (
+        <>
+            {console.log("favorites", favorites)}
+            <MasterDetailLayout
                 isOpen={!!selectedPerson}
                 master={
                     <NegativeBox>
                         <RowList>
                             {list.map((person) => (
-                                <Row
-                                    headline={
-                                        //If favorite person is selected, show the tag else nothing
-                                        favorites.includes(person) ? (
-                                            <Tag type="promo">Favorite</Tag>
-                                        ) : null
-                                    }
-                                    key={person.login.uuid}
-                                    asset={
-                                        <Circle
-                                            size={40}
-                                            backgroundImage={
-                                                person.picture.medium
-                                            }
-                                        />
-                                    }
-                                    title={person.name.fullname}
-                                    onPress={() => {
-                                        setSelectedPerson(person);
-                                    }}
-                                />
+                                <>
+                                    <Row
+                                        headline={
+                                            favorites.includes(person) ? (
+                                                <Tag type="promo">Favorite</Tag>
+                                            ) : null
+                                        }
+                                        key={person.login.uuid}
+                                        asset={
+                                            <Circle
+                                                size={40}
+                                                backgroundImage={
+                                                    person.picture.medium
+                                                }
+                                            />
+                                        }
+                                        title={person.name.fullname}
+                                        onPress={() => {
+                                            setSelectedPerson(person);
+                                        }}
+                                    />
+                                </>
                             ))}
                         </RowList>
                     </NegativeBox>
@@ -123,10 +132,16 @@ const PeopleList: React.FC<Props> = ({ list, favorites, handleFavoriteOnPress, i
                                 }}
                                 right={
                                     <NavigationBarActionGroup>
-                                        <NavigationBarAction aria-label="Mark as favorite" onPress={
-                                            handleFavoriteOnPress.bind(null, selectedPerson)
-                                        }>
-                                            {favorites.includes(selectedPerson) ? (
+                                        <NavigationBarAction
+                                            aria-label="Mark as favorite"
+                                            onPress={handleFavoriteOnPress.bind(
+                                                null,
+                                                selectedPerson
+                                            )}
+                                        >
+                                            {favorites.includes(
+                                                selectedPerson
+                                            ) ? (
                                                 <IconStarFilled color="currentColor" />
                                             ) : (
                                                 <IconStarRegular color="currentColor" />
@@ -153,6 +168,8 @@ const PeopleList: React.FC<Props> = ({ list, favorites, handleFavoriteOnPress, i
                     )
                 }
             />
+        </>
+    );
 };
 
 export default PeopleList;
