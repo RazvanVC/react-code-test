@@ -34,11 +34,7 @@ const ContactDetails: React.FC<Props> = ({ person }) => (
             }
             <Stack space={8}>
                 <Text4 regular>
-                    {[
-                        person.name.title,
-                        person.name.first,
-                        person.name.last,
-                    ].join(" ")}
+                    {person.name.fullname}
                 </Text4>
                 <Stack space={0}>
                     <Inline space={8} alignItems="center">

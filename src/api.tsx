@@ -3,6 +3,7 @@ export type Person = {
         title: string;
         first: string;
         last: string;
+        fullname: string;
     };
     location: {
         street: {
@@ -59,12 +60,17 @@ export const fetchPeople = async (): Promise<Person[]> => {
     const data = await response.json();
 
     // simulate bad network
-    await sleep(2000);
+    await sleep(2000); 
     // simulate random errors
     if (Math.random() > 0.8) {
         throw new Error("FetchPeople: Something went wrong");
     }
 
-
-    return await data.results;
+    return data.results.map((person: Person) => ({
+        ...person,
+        name: {
+            ...person.name,
+            fullname: `${person.name.title} ${person.name.first} ${person.name.last}`,
+        },
+    }));
 };

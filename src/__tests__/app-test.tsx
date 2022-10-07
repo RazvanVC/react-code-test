@@ -28,7 +28,7 @@ test("Task 1", async () => {
     renderApp();
 
     const person1 = apiResponse[0];
-    const person1Name = person1.name.title + " " + person1.name.first + " " + person1.name.last;
+    const person1Name = person1.name.fullname;
 
     const personRow = await screen.findByRole("button", { name: person1Name });
     expect(personRow).toBeInTheDocument();
@@ -53,7 +53,7 @@ test("Task 2", async () => {
     renderApp();
 
     const person1 = apiResponse[0];
-    const person1Name = person1.name.title + " " + person1.name.first + " " + person1.name.last;
+    const person1Name = person1.name.fullname;
 
     const personRow = await screen.findByRole("button", { name: person1Name });
     expect(personRow).toBeInTheDocument();
