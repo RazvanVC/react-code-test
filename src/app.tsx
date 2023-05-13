@@ -21,10 +21,7 @@ const App = (): JSX.Element => {
         localStorage.getItem("mainSection")?.replace(/"/gi, "") || "People"
     );
     const [people, setPeople] = React.useState<Person[]>([]);
-    //retrive favorites from localstorage if exists
-    const [favorites, setFavorites] = React.useState<Person[]>(
-        JSON.parse(localStorage.getItem("favorites") || "[]")
-    );
+    const [favorites, setFavorites] = React.useState<Person[]>([]);
     const [selectedPerson, setSelectedPerson] = React.useState<Person | null>(
         null
     );
@@ -43,10 +40,8 @@ const App = (): JSX.Element => {
     }, []);
 
     React.useEffect(() => {
-        //save favorites to localstorage
-        localStorage.setItem("favorites", JSON.stringify(favorites));
         localStorage.setItem("mainSection", JSON.stringify(mainSection));
-    }, [favorites, mainSection]);
+    }, [mainSection]);
 
     /*
      * This function is passed to the PeopleList component to handle the favorite button press
